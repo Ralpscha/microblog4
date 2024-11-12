@@ -6,6 +6,14 @@ from urllib.parse import urlsplit
 import sqlalchemy as sa
 from app import db
 from app.models import User
+from datetime import datetime, timezone
+
+
+@app.before_request
+def before_request():
+    if current_user.is_authenticated:
+        current_user.last_seen = datetime.now(timezone.utc)
+        db.session.commit()
 
 
 @app.route('/')
@@ -71,3 +79,4 @@ def user(username):
         {'author': user, 'body': 'Test post #2'}
     ]
     return render_template('user.html', user=user, posts=posts)
+
